@@ -420,21 +420,10 @@
       </button>
 
       <div class="nav-section">Pelayanan</div>
-      <button class="nav-item" onclick="toggleSub('sub-layanan',this)">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-        Input Pasien
-        <svg style="margin-left:auto;transition:transform 0.2s" class="chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+      <button class="nav-item" onclick="showPage('layanan',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+      Input Pasien
       </button>
-      <div class="nav-sub" id="sub-layanan">
-        <button class="nav-sub-item" onclick="showForm('ANC',this)">ANC</button>
-        <button class="nav-sub-item" onclick="showForm('INC',this)">INC</button>
-        <button class="nav-sub-item" onclick="showForm('PNC',this)">PNC</button>
-        <button class="nav-sub-item" onclick="showForm('KB',this)">KB</button>
-        <button class="nav-sub-item" onclick="showForm('IMUNISASI',this)">Imunisasi</button>
-        <button class="nav-sub-item" onclick="showForm('BAYI_BALITA',this)">Bayi Balita Anak</button>
-        <button class="nav-sub-item" onclick="showForm('UMUM',this)">Umum</button>
-        <button class="nav-sub-item" onclick="showForm('RAWAT_INAP',this)">Rawat Inap</button>
-      </div>
 
       <div class="nav-section">Manajemen</div>
       <button class="nav-item" onclick="showPage('data-pasien',this)">
