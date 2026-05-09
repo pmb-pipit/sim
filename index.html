@@ -912,7 +912,7 @@ const formDefs = {
     {id:'namaSuami',label:'Nama Suami',type:'text'},
     {id:'tempatLahir',label:'Tempat Lahir',type:'text'},
     {id:'tanggalLahir',label:'Tanggal Lahir',type:'date'},
-    {id:'usia',label:'Usia',type:'number',placeholder:'tahun'},
+    {id:'usia',label:'Usia',type:'text',placeholder:'Otomatis dari tanggal lahir'},
     {id:'alamatLengkap',label:'Alamat Lengkap',type:'textarea',full:true},
     {id:'desa',label:'Desa/Kelurahan',type:'text'},
     {id:'kecamatan',label:'Kecamatan',type:'text'},
@@ -1150,12 +1150,39 @@ function showForm(service, navEl) {
     const el = document.getElementById(`f_${f.id}`);
     if (el && !el.value) el.value = today();
   });
+  const tglLahirEl = document.getElementById('f_tanggalLahir');
+const usiaEl = document.getElementById('f_usia');
+if (tglLahirEl && usiaEl) {
+  tglLahirEl.addEventListener('change', function() {
+    if (this.value) {
+      usiaEl.value = hitungUsia(this.value);
+    }
+  });
+}
   showPage('form');
   document.getElementById('topbar-title').textContent = `Input — ${serviceLabels[service]}`;
   if (navEl) {
     document.querySelectorAll('.nav-sub-item').forEach(n=>n.classList.remove('active'));
     navEl.classList.add('active');
   }
+}
+  
+function hitungUsia(tglLahir) {
+  const lahir = new Date(tglLahir);
+  const sekarang = new Date();
+  let tahun = sekarang.getFullYear() - lahir.getFullYear();
+  let bulan = sekarang.getMonth() - lahir.getMonth();
+  let hari = sekarang.getDate() - lahir.getDate();
+  if (hari < 0) {
+    bulan--;
+    const haribulanLalu = new Date(sekarang.getFullYear(), sekarang.getMonth(), 0).getDate();
+    hari += haribulanLalu;
+  }
+  if (bulan < 0) {
+    tahun--;
+    bulan += 12;
+  }
+  return `${tahun} tahun ${bulan} bulan ${hari} hari`;
 }
 
 function resetForm() {
