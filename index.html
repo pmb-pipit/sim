@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMB Pipit Uly Arta</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose: #C8556A;
+    --rose-light: #E8899A;
+    --rose-dark: #9B3A4E;
+    --rose-pale: #FDF0F2;
+    --rose-muted: #F5D5DA;
+    --teal: #2E8B7A;
+    --teal-light: #4AAFA0;
+    --teal-pale: #EAF6F4;
+    --gold: #C9A84C;
+    --gold-pale: #FBF5E6;
+    --navy: #1A2B4A;
+    --navy-mid: #2D4270;
+    --text: #1E1E2E;
+    --text-muted: #6B6B80;
+    --bg: #FAFAF9;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+    --shadow: 0 2px 16px rgba(26,43,74,0.08);
+    --shadow-lg: 0 8px 32px rgba(26,43,74,0.14);
+    --radius: 12px;
+    --radius-lg: 18px;
+    --sidebar-w: 250px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  /* ===== LOGIN ===== */
+  #login-screen {
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(135deg, #FDF0F2 0%, #EAF6F4 50%, #FBF5E6 100%);
+    position:relative; overflow:hidden;
+  }
+  #login-screen::before {
+    content:''; position:absolute; width:600px; height:600px; border-radius:50%;
+    background: radial-gradient(circle, rgba(200,85,106,0.08) 0%, transparent 70%);
+    top:-150px; right:-150px; pointer-events:none;
+  }
+  #login-screen::after {
+    content:''; position:absolute; width:400px; height:400px; border-radius:50%;
+    background: radial-gradient(circle, rgba(46,139,122,0.08) 0%, transparent 70%);
+    bottom:-100px; left:-100px; pointer-events:none;
+  }
+  .login-card {
+    background:var(--white); border-radius:24px; padding:48px 44px;
+    box-shadow:0 20px 60px rgba(26,43,74,0.12); width:420px; max-width:95vw;
+    position:relative; z-index:1; animation:fadeUp 0.5s ease;
+  }
+  .login-logo { text-align:center; margin-bottom:32px; }
+  .login-logo .icon-wrap {
+    width:72px; height:72px; background:linear-gradient(135deg,var(--rose),var(--rose-dark));
+    border-radius:20px; display:inline-flex; align-items:center; justify-content:center;
+    margin-bottom:16px; box-shadow:0 8px 24px rgba(200,85,106,0.3);
+  }
+  .login-logo .icon-wrap svg { width:36px; height:36px; fill:white; }
+  .login-logo h1 { font-family:'Lora',serif; font-size:1.5rem; font-weight:600; color:var(--navy); line-height:1.3; }
+  .login-logo p { color:var(--text-muted); font-size:0.82rem; margin-top:4px; }
+  .form-group { margin-bottom:18px; }
+  .form-group label { display:block; font-size:0.82rem; font-weight:600; color:var(--text); margin-bottom:7px; letter-spacing:0.02em; }
+  .form-group input {
+    width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px;
+    font-family:inherit; font-size:0.9rem; color:var(--text); background:var(--bg);
+    transition:all 0.2s;
+  }
+  .form-group input:focus { outline:none; border-color:var(--rose); box-shadow:0 0 0 3px rgba(200,85,106,0.12); background:white; }
+  .btn-login {
+    width:100%; padding:13px; background:linear-gradient(135deg,var(--rose),var(--rose-dark));
+    color:white; border:none; border-radius:10px; font-family:inherit; font-size:0.95rem;
+    font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:6px;
+    box-shadow:0 4px 16px rgba(200,85,106,0.35);
+  }
+  .btn-login:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(200,85,106,0.45); }
+  .login-error { color:var(--rose-dark); font-size:0.82rem; text-align:center; margin-top:10px; display:none; }
+
+  /* ===== LAYOUT ===== */
+  #app { display:none; min-height:100vh; flex-direction:row; }
+  #app.active { display:flex; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width:var(--sidebar-w); min-height:100vh; background:var(--navy);
+    display:flex; flex-direction:column; position:fixed; left:0; top:0; z-index:100;
+    box-shadow:4px 0 20px rgba(26,43,74,0.15);
+  }
+  .sidebar-brand {
+    padding:24px 20px 20px; border-bottom:1px solid rgba(255,255,255,0.08);
+    display:flex; align-items:center; gap:12px;
+  }
+  .sidebar-brand .brand-icon {
+    width:40px; height:40px; background:linear-gradient(135deg,var(--rose),var(--rose-dark));
+    border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .sidebar-brand .brand-icon svg { width:20px; height:20px; fill:white; }
+  .sidebar-brand .brand-text h2 { font-family:'Lora',serif; font-size:0.88rem; font-weight:600; color:white; line-height:1.3; }
+  .sidebar-brand .brand-text span { font-size:0.72rem; color:rgba(255,255,255,0.5); }
+  .sidebar-nav { flex:1; padding:16px 0; overflow-y:auto; }
+  .nav-section { padding:10px 20px 6px; font-size:0.68rem; font-weight:700; color:rgba(255,255,255,0.35); letter-spacing:0.1em; text-transform:uppercase; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px; padding:9px 20px;
+    color:rgba(255,255,255,0.65); cursor:pointer; transition:all 0.2s;
+    font-size:0.85rem; font-weight:500; position:relative;
+    border:none; background:none; width:100%; text-align:left;
+  }
+  .nav-item svg { width:17px; height:17px; flex-shrink:0; opacity:0.8; }
+  .nav-item:hover { color:white; background:rgba(255,255,255,0.06); }
+  .nav-item.active { color:white; background:rgba(200,85,106,0.2); }
+  .nav-item.active::before { content:''; position:absolute; left:0; top:4px; bottom:4px; width:3px; background:var(--rose); border-radius:0 2px 2px 0; }
+  .nav-item.active svg { opacity:1; }
+  .nav-sub { background:rgba(0,0,0,0.15); overflow:hidden; max-height:0; transition:max-height 0.3s ease; }
+  .nav-sub.open { max-height:400px; }
+  .nav-sub-item {
+    display:flex; align-items:center; gap:8px; padding:8px 20px 8px 44px;
+    color:rgba(255,255,255,0.55); cursor:pointer; font-size:0.8rem; font-weight:500;
+    transition:all 0.2s; border:none; background:none; width:100%; text-align:left;
+  }
+  .nav-sub-item:hover { color:white; background:rgba(255,255,255,0.05); }
+  .nav-sub-item.active { color:var(--rose-light); }
+  .nav-sub-item::before { content:'·'; font-size:1.2rem; color:currentColor; }
+  .sidebar-user {
+    padding:16px 20px; border-top:1px solid rgba(255,255,255,0.08);
+    display:flex; align-items:center; gap:10px;
+  }
+  .user-avatar {
+    width:34px; height:34px; border-radius:50%;
+    background:linear-gradient(135deg,var(--teal),var(--teal-light));
+    display:flex; align-items:center; justify-content:center;
+    color:white; font-weight:700; font-size:0.82rem; flex-shrink:0;
+  }
+  .user-info { flex:1; min-width:0; }
+  .user-info .uname { font-size:0.82rem; font-weight:600; color:white; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .user-info .urole { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+  .btn-logout { background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; transition:color 0.2s; flex-shrink:0; }
+  .btn-logout:hover { color:var(--rose-light); }
+  .btn-logout svg { width:16px; height:16px; }
+
+  /* ===== MAIN ===== */
+  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+  .topbar {
+    background:white; border-bottom:1px solid var(--border); padding:0 28px;
+    height:60px; display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:50;
+  }
+  .topbar-title { font-size:1rem; font-weight:700; color:var(--navy); }
+  .topbar-right { display:flex; align-items:center; gap:12px; }
+  .topbar-date { font-size:0.78rem; color:var(--text-muted); }
+  .badge-notif {
+    background:var(--rose); color:white; font-size:0.7rem; font-weight:700;
+    padding:2px 7px; border-radius:20px; cursor:pointer;
+  }
+  .content { padding:28px; flex:1; }
+
+  /* ===== DASHBOARD ===== */
+  .dash-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin-bottom:28px; }
+  .stat-card {
+    background:white; border-radius:var(--radius-lg); padding:22px 22px 18px;
+    box-shadow:var(--shadow); border:1px solid var(--border); position:relative; overflow:hidden;
+    transition:transform 0.2s, box-shadow 0.2s;
+  }
+  .stat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+  .stat-card::after { content:''; position:absolute; top:0; right:0; width:80px; height:80px; border-radius:0 0 0 80px; opacity:0.06; }
+  .stat-card.rose::after { background:var(--rose); }
+  .stat-card.teal::after { background:var(--teal); }
+  .stat-card.gold::after { background:var(--gold); }
+  .stat-card.navy::after { background:var(--navy); }
+  .stat-icon { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+  .stat-icon svg { width:22px; height:22px; }
+  .stat-card.rose .stat-icon { background:var(--rose-pale); }
+  .stat-card.rose .stat-icon svg { color:var(--rose); }
+  .stat-card.teal .stat-icon { background:var(--teal-pale); }
+  .stat-card.teal .stat-icon svg { color:var(--teal); }
+  .stat-card.gold .stat-icon { background:var(--gold-pale); }
+  .stat-card.gold .stat-icon svg { color:var(--gold); }
+  .stat-card.navy .stat-icon { background:#EEF1F7; }
+  .stat-card.navy .stat-icon svg { color:var(--navy); }
+  .stat-value { font-size:2rem; font-weight:800; color:var(--navy); line-height:1; }
+  .stat-label { font-size:0.78rem; color:var(--text-muted); margin-top:4px; font-weight:500; }
+  .stat-sub { font-size:0.72rem; color:var(--text-muted); margin-top:8px; }
+
+  .section-title { font-family:'Lora',serif; font-size:1.1rem; font-weight:600; color:var(--navy); margin-bottom:16px; }
+
+  .service-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:28px; }
+  .service-stat {
+    background:white; border-radius:var(--radius); padding:16px; text-align:center;
+    box-shadow:var(--shadow); border:1px solid var(--border); cursor:pointer; transition:all 0.2s;
+  }
+  .service-stat:hover { border-color:var(--rose); }
+  .service-stat .sname { font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; }
+  .service-stat .sval { font-size:1.5rem; font-weight:800; color:var(--navy); margin-top:4px; }
+
+  .bumil-section { background:white; border-radius:var(--radius-lg); padding:20px; box-shadow:var(--shadow); border:1px solid var(--border); }
+  .bumil-list { display:grid; gap:10px; margin-top:12px; }
+  .bumil-item { display:flex; align-items:center; gap:12px; padding:12px; background:var(--rose-pale); border-radius:10px; }
+  .bumil-avatar { width:36px; height:36px; border-radius:50%; background:var(--rose); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.82rem; flex-shrink:0; }
+  .bumil-info .bname { font-size:0.85rem; font-weight:600; color:var(--navy); }
+  .bumil-info .bdetail { font-size:0.75rem; color:var(--text-muted); }
+  .bumil-usia { margin-left:auto; font-size:0.75rem; font-weight:700; color:var(--rose); background:white; padding:3px 10px; border-radius:20px; }
+
+  /* ===== FORM ===== */
+  .page-header { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+  .page-header .back-btn {
+    width:36px; height:36px; border-radius:10px; background:white; border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s;
+    box-shadow:var(--shadow);
+  }
+  .page-header .back-btn:hover { border-color:var(--rose); }
+  .page-header .back-btn svg { width:18px; height:18px; color:var(--text-muted); }
+  .page-header h2 { font-family:'Lora',serif; font-size:1.2rem; font-weight:600; color:var(--navy); }
+  .page-header .service-badge { padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700; letter-spacing:0.03em; }
+
+  .form-card { background:white; border-radius:var(--radius-lg); padding:28px; box-shadow:var(--shadow); border:1px solid var(--border); }
+  .form-section-title { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--rose); border-bottom:1px solid var(--rose-muted); padding-bottom:8px; margin:24px 0 16px; }
+  .form-section-title:first-child { margin-top:0; }
+  .form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-group.half { grid-column:span 1; }
+  .form-group label { font-size:0.78rem; font-weight:600; color:var(--text); }
+  .form-group label .req { color:var(--rose); margin-left:2px; }
+  .form-group input, .form-group select, .form-group textarea {
+    padding:9px 12px; border:1.5px solid var(--border); border-radius:9px;
+    font-family:inherit; font-size:0.85rem; color:var(--text); background:var(--bg);
+    transition:all 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline:none; border-color:var(--rose); background:white;
+    box-shadow:0 0 0 3px rgba(200,85,106,0.1);
+  }
+  .form-group textarea { resize:vertical; min-height:80px; }
+  .form-group select { cursor:pointer; }
+  .form-actions { display:flex; gap:12px; margin-top:24px; justify-content:flex-end; }
+  .btn { padding:10px 24px; border-radius:9px; font-family:inherit; font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.2s; border:none; }
+  .btn-primary { background:linear-gradient(135deg,var(--rose),var(--rose-dark)); color:white; box-shadow:0 4px 12px rgba(200,85,106,0.3); }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(200,85,106,0.4); }
+  .btn-secondary { background:white; color:var(--text); border:1.5px solid var(--border); }
+  .btn-secondary:hover { border-color:var(--rose); color:var(--rose); }
+  .btn-teal { background:linear-gradient(135deg,var(--teal),#1A6B5E); color:white; box-shadow:0 4px 12px rgba(46,139,122,0.3); }
+  .btn-teal:hover { transform:translateY(-1px); }
+
+  /* SERVICE MENU */
+  .service-menu { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; }
+  .service-btn {
+    background:white; border:1.5px solid var(--border); border-radius:var(--radius-lg);
+    padding:22px 16px; text-align:center; cursor:pointer; transition:all 0.2s;
+    box-shadow:var(--shadow); position:relative; overflow:hidden;
+  }
+  .service-btn::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; }
+  .service-btn.anc::before { background:linear-gradient(90deg,#E91E8C,#C8556A); }
+  .service-btn.inc::before { background:linear-gradient(90deg,#C8556A,#E87A5A); }
+  .service-btn.pnc::before { background:linear-gradient(90deg,#E87A5A,#E8AA5A); }
+  .service-btn.kb::before { background:linear-gradient(90deg,var(--teal),var(--teal-light)); }
+  .service-btn.imun::before { background:linear-gradient(90deg,#2E6BBF,#5A9AE8); }
+  .service-btn.bba::before { background:linear-gradient(90deg,#8B2EBF,#B05AE8); }
+  .service-btn.umum::before { background:linear-gradient(90deg,var(--gold),#E8C85A); }
+  .service-btn.rawat::before { background:linear-gradient(90deg,var(--navy),var(--navy-mid)); }
+  .service-btn:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); border-color:transparent; }
+  .service-btn .svc-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
+  .service-btn .svc-icon svg { width:24px; height:24px; }
+  .service-btn.anc .svc-icon { background:#FDE8F4; }
+  .service-btn.anc .svc-icon svg { color:#E91E8C; }
+  .service-btn.inc .svc-icon { background:var(--rose-pale); }
+  .service-btn.inc .svc-icon svg { color:var(--rose); }
+  .service-btn.pnc .svc-icon { background:#FEF1EA; }
+  .service-btn.pnc .svc-icon svg { color:#E87A5A; }
+  .service-btn.kb .svc-icon { background:var(--teal-pale); }
+  .service-btn.kb .svc-icon svg { color:var(--teal); }
+  .service-btn.imun .svc-icon { background:#EBF2FD; }
+  .service-btn.imun .svc-icon svg { color:#2E6BBF; }
+  .service-btn.bba .svc-icon { background:#F5EAFD; }
+  .service-btn.bba .svc-icon svg { color:#8B2EBF; }
+  .service-btn.umum .svc-icon { background:var(--gold-pale); }
+  .service-btn.umum .svc-icon svg { color:var(--gold); }
+  .service-btn.rawat .svc-icon { background:#EEF1F7; }
+  .service-btn.rawat .svc-icon svg { color:var(--navy); }
+  .service-btn h3 { font-size:0.9rem; font-weight:700; color:var(--navy); }
+  .service-btn p { font-size:0.72rem; color:var(--text-muted); margin-top:3px; }
+
+  /* DATA PASIEN */
+  .search-bar { display:flex; gap:12px; margin-bottom:20px; }
+  .search-input-wrap { position:relative; flex:1; }
+  .search-input-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--text-muted); }
+  .search-input-wrap input { width:100%; padding:10px 14px 10px 40px; border:1.5px solid var(--border); border-radius:10px; font-family:inherit; font-size:0.88rem; background:white; transition:all 0.2s; }
+  .search-input-wrap input:focus { outline:none; border-color:var(--rose); box-shadow:0 0 0 3px rgba(200,85,106,0.1); }
+  .btn-search { padding:10px 20px; background:var(--rose); color:white; border:none; border-radius:10px; font-family:inherit; font-weight:700; cursor:pointer; font-size:0.85rem; }
+
+  .data-table-wrap { background:white; border-radius:var(--radius-lg); box-shadow:var(--shadow); border:1px solid var(--border); overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  thead { background:linear-gradient(135deg,var(--navy),var(--navy-mid)); }
+  thead th { padding:12px 16px; font-size:0.75rem; font-weight:700; color:white; text-align:left; letter-spacing:0.03em; }
+  tbody tr { border-bottom:1px solid var(--border); transition:background 0.15s; }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:hover { background:var(--rose-pale); }
+  tbody td { padding:12px 16px; font-size:0.83rem; color:var(--text); }
+  .tag { display:inline-block; padding:2px 10px; border-radius:20px; font-size:0.7rem; font-weight:700; }
+  .tag-anc { background:#FDE8F4; color:#C0186C; }
+  .tag-inc { background:var(--rose-pale); color:var(--rose-dark); }
+  .tag-pnc { background:#FEF1EA; color:#C06030; }
+  .tag-kb { background:var(--teal-pale); color:var(--teal); }
+  .tag-imun { background:#EBF2FD; color:#2050A0; }
+  .tag-bba { background:#F5EAFD; color:#6B20A0; }
+  .tag-umum { background:var(--gold-pale); color:#906B00; }
+  .tag-rawat { background:#EEF1F7; color:var(--navy); }
+
+  /* OPERASIONAL */
+  .ops-tabs { display:flex; gap:8px; margin-bottom:20px; }
+  .ops-tab { padding:8px 20px; border-radius:8px; font-family:inherit; font-size:0.83rem; font-weight:600; cursor:pointer; border:1.5px solid var(--border); background:white; color:var(--text-muted); transition:all 0.2s; }
+  .ops-tab.active { background:var(--navy); color:white; border-color:var(--navy); }
+
+  .ops-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .ops-card { background:white; border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow); border:1px solid var(--border); }
+  .ops-card h3 { font-size:0.9rem; font-weight:700; color:var(--navy); margin-bottom:16px; }
+
+  .stok-list { display:grid; gap:10px; }
+  .stok-item { display:flex; align-items:center; gap:12px; padding:12px; border-radius:10px; border:1px solid var(--border); }
+  .stok-item.low { border-color:var(--rose); background:var(--rose-pale); }
+  .stok-info { flex:1; }
+  .stok-info .sitem-name { font-size:0.85rem; font-weight:600; color:var(--navy); }
+  .stok-info .sitem-detail { font-size:0.73rem; color:var(--text-muted); margin-top:2px; }
+  .stok-qty { font-size:1.1rem; font-weight:800; color:var(--navy); }
+  .stok-item.low .stok-qty { color:var(--rose); }
+  .stok-warn { font-size:0.68rem; font-weight:700; color:var(--rose); background:var(--rose-muted); padding:2px 7px; border-radius:10px; margin-top:3px; display:block; }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(26,43,74,0.5); z-index:200; display:none; align-items:center; justify-content:center; padding:16px; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:white; border-radius:var(--radius-lg); width:640px; max-width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(26,43,74,0.2); animation:fadeUp 0.3s ease; }
+  .modal-header { padding:22px 24px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:white; z-index:1; }
+  .modal-header h3 { font-family:'Lora',serif; font-size:1.05rem; font-weight:600; color:var(--navy); }
+  .modal-close { width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:white; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .modal-close:hover { background:var(--rose-pale); border-color:var(--rose); }
+  .modal-body { padding:24px; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:24px; right:24px; background:var(--navy); color:white; padding:13px 20px; border-radius:12px; font-size:0.85rem; font-weight:600; box-shadow:0 8px 24px rgba(26,43,74,0.3); z-index:300; display:none; animation:slideIn 0.3s ease; }
+  .toast.success { background:var(--teal); }
+  .toast.error { background:var(--rose-dark); }
+  .toast.warning { background:var(--gold); color:var(--navy); }
+  .toast.show { display:block; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+  .page { display:none; animation:fadeUp 0.3s ease; }
+  .page.active { display:block; }
+
+  .empty-state { text-align:center; padding:48px 24px; color:var(--text-muted); }
+  .empty-state svg { width:48px; height:48px; margin:0 auto 12px; opacity:0.3; display:block; }
+  .empty-state p { font-size:0.9rem; }
+
+  /* NOTIF PANEL */
+  .notif-panel { position:fixed; top:60px; right:16px; width:320px; background:white; border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); border:1px solid var(--border); z-index:90; display:none; animation:fadeUp 0.2s ease; }
+  .notif-panel.open { display:block; }
+  .notif-header { padding:14px 16px 10px; border-bottom:1px solid var(--border); font-size:0.85rem; font-weight:700; color:var(--navy); }
+  .notif-item { padding:12px 16px; border-bottom:1px solid var(--border); display:flex; gap:10px; align-items:flex-start; }
+  .notif-item:last-child { border-bottom:none; }
+  .notif-dot { width:8px; height:8px; border-radius:50%; background:var(--rose); flex-shrink:0; margin-top:5px; }
+  .notif-text { font-size:0.8rem; color:var(--text); line-height:1.4; }
+  .notif-time { font-size:0.7rem; color:var(--text-muted); margin-top:3px; }
+
+  @media (max-width:768px) {
+    :root { --sidebar-w:0px; }
+    .sidebar { transform:translateX(-100%); transition:transform 0.3s; }
+    .sidebar.open { transform:translateX(0); --sidebar-w:250px; }
+    .main { margin-left:0; }
+    .ops-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/><path d="M9 8h2v8H9zm4 0h2v8h-2z" fill="none"/><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/></svg>
+      </div>
+      <h1>PMB Pipit Uly Arta</h1>
+      <p>Praktik Mandiri Bidan</p>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="login-user" placeholder="Masukkan username" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="Masukkan password">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Masuk</button>
+    <div class="login-error" id="login-err">Username atau password salah.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/></svg>
+      </div>
+      <div class="brand-text">
+        <h2>PMB Pipit Uly Arta</h2>
+        <span>Praktik Mandiri Bidan</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Utama</div>
+      <button class="nav-item active" onclick="showPage('dashboard',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        Dashboard
+      </button>
+
+      <div class="nav-section">Pelayanan</div>
+      <button class="nav-item" onclick="toggleSub('sub-layanan',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+        Input Pasien
+        <svg style="margin-left:auto;transition:transform 0.2s" class="chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+      </button>
+      <div class="nav-sub" id="sub-layanan">
+        <button class="nav-sub-item" onclick="showForm('ANC',this)">ANC</button>
+        <button class="nav-sub-item" onclick="showForm('INC',this)">INC</button>
+        <button class="nav-sub-item" onclick="showForm('PNC',this)">PNC</button>
+        <button class="nav-sub-item" onclick="showForm('KB',this)">KB</button>
+        <button class="nav-sub-item" onclick="showForm('IMUNISASI',this)">Imunisasi</button>
+        <button class="nav-sub-item" onclick="showForm('BAYI_BALITA',this)">Bayi Balita Anak</button>
+        <button class="nav-sub-item" onclick="showForm('UMUM',this)">Umum</button>
+        <button class="nav-sub-item" onclick="showForm('RAWAT_INAP',this)">Rawat Inap</button>
+      </div>
+
+      <div class="nav-section">Manajemen</div>
+      <button class="nav-item" onclick="showPage('data-pasien',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        Data Pasien
+      </button>
+      <button class="nav-item" onclick="toggleSub('sub-ops',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+        Operasional
+        <svg style="margin-left:auto;transition:transform 0.2s" class="chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+      </button>
+      <div class="nav-sub" id="sub-ops">
+        <button class="nav-sub-item" onclick="showOps('obat',this)">Obat</button>
+        <button class="nav-sub-item" onclick="showOps('vaksin',this)">Vaksin</button>
+        <button class="nav-sub-item" onclick="showOps('bhp',this)">Barang Habis Pakai</button>
+      </div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-avatar-text">A</div>
+      <div class="user-info">
+        <div class="uname" id="sidebar-username">Admin</div>
+        <div class="urole" id="sidebar-role">Bidan</div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()" title="Keluar">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-right">
+        <span class="topbar-date" id="topbar-date"></span>
+        <span class="badge-notif" id="notif-badge" onclick="toggleNotif()" style="display:none">0 Notif</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- DASHBOARD PAGE -->
+      <div class="page active" id="page-dashboard">
+        <div class="dash-grid">
+          <div class="stat-card rose">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div>
+            <div class="stat-value" id="dash-hari">0</div>
+            <div class="stat-label">Pasien Hari Ini</div>
+            <div class="stat-sub" id="dash-hari-sub">Belum ada data</div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg></div>
+            <div class="stat-value" id="dash-bulan">0</div>
+            <div class="stat-label">Pasien Bulan Ini</div>
+            <div class="stat-sub" id="dash-bulan-sub">Bulan berjalan</div>
+          </div>
+          <div class="stat-card gold">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/></svg></div>
+            <div class="stat-value" id="dash-bumil">0</div>
+            <div class="stat-label">Bumil Aktif</div>
+            <div class="stat-sub">ANC bulan ini</div>
+          </div>
+          <div class="stat-card navy">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.33C18 2.54 15.46 0 12.33 0c-1.7 0-3.21.72-4.27 1.87C7 .72 5.49 0 3.79 0 .66 0-1.88 2.54-1.88 5.67c0 .45.11.89.18 1.33H-2v2h22V6zm-7.67-4c1.54 0 2.67 1.13 2.67 2.67 0 .8-.31 1.53-.8 2.07l-1.87-.74V6h-2V4.67L8.46 4.4A2.67 2.67 0 0112.33 2zM4.54 6c-.49-.54-.8-1.27-.8-2.07C3.74 2.39 4.87 1.26 6.41 1.26S9.08 2.39 9.08 3.93c0 .8-.31 1.53-.8 2.07H4.54zM2 20h20v2H2zm0-7h20v6H2z"/></svg></div>
+            <div class="stat-value" id="dash-total">0</div>
+            <div class="stat-label">Total Pasien</div>
+            <div class="stat-sub">Semua waktu</div>
+          </div>
+        </div>
+
+        <h3 class="section-title">Pasien per Layanan (Bulan Ini)</h3>
+        <div class="service-grid" id="service-stats-grid">
+          <div class="service-stat"><div class="sname">ANC</div><div class="sval" id="ss-ANC">0</div></div>
+          <div class="service-stat"><div class="sname">INC</div><div class="sval" id="ss-INC">0</div></div>
+          <div class="service-stat"><div class="sname">PNC</div><div class="sval" id="ss-PNC">0</div></div>
+          <div class="service-stat"><div class="sname">KB</div><div class="sval" id="ss-KB">0</div></div>
+          <div class="service-stat"><div class="sname">Imunisasi</div><div class="sval" id="ss-IMUNISASI">0</div></div>
+          <div class="service-stat"><div class="sname">Bayi Balita</div><div class="sval" id="ss-BAYI_BALITA">0</div></div>
+          <div class="service-stat"><div class="sname">Umum</div><div class="sval" id="ss-UMUM">0</div></div>
+          <div class="service-stat"><div class="sname">Rawat Inap</div><div class="sval" id="ss-RAWAT_INAP">0</div></div>
+        </div>
+
+        <h3 class="section-title">Bumil Aktif (ANC Bulan Ini)</h3>
+        <div class="bumil-section">
+          <div class="bumil-list" id="bumil-list">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/></svg>
+              <p>Belum ada data bumil aktif</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAYANAN MENU PAGE -->
+      <div class="page" id="page-layanan">
+        <h2 class="section-title" style="margin-bottom:20px">Pilih Layanan</h2>
+        <div class="service-menu">
+          <div class="service-btn anc" onclick="showForm('ANC')">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/></svg></div>
+            <h3>ANC</h3><p>Antenatal Care</p>
+          </div>
+          <div class="service-btn inc" onclick="showForm('INC')">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg></div>
+            <h3>INC</h3><p>Intrapartum Care</p>
+          </div>
+          <div class="service-btn pnc" onclick="showForm('PNC')">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+            <h3>PNC</h3><p>Postnatal Care</p>
+          </div>
+          <div class="service-btn kb" onclick="showForm('KB')">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg></div>
+            <h3>KB</h3><p>Keluarga Berencana</p>
+          </div>
+          <div class="service-btn imun" onclick="showForm('IMUNISASI')">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 10h-2v5h2v-5zm4 0h-2v5h2v-5zm8.5 7H4v2h15v-2zm-4.5-7h-2v5h2v-5zM11.5 1L2 6v2h19V6l-9.5-5z"/></svg></div>
+            <h3>Imunisasi</h3><p>Vaksinasi</p>
+          </div>
+          <div class="service-btn bba" onclick="showForm('BAYI_BALITA')">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 9c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-9-4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM8 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm11 7c0 2-1 3.5-2.5 4l-1 3h-3l-1-3C10 14.5 9 13 9 11V9h10v2zm-9 0H8c0-1.1.9-2 2-2h2c1.1 0 2 .9 2 2h-4zM3 9c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg></div>
+            <h3>Bayi Balita</h3><p>Anak</p>
+          </div>
+          <div class="service-btn umum" onclick="showForm('UMUM')">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg></div>
+            <h3>Umum</h3><p>Pemeriksaan Umum</p>
+          </div>
+          <div class="service-btn rawat" onclick="showForm('RAWAT_INAP')">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h4l3 3 3-3h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 12 12 12s-3.5-1.57-3.5-3.5S10.07 5 12 5zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 14.82 9.64 14 12 14s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V18z"/></svg></div>
+            <h3>Rawat Inap</h3><p>Perawatan</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM PAGE -->
+      <div class="page" id="page-form">
+        <div class="page-header">
+          <button class="back-btn" onclick="showPage('layanan')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <h2 id="form-title">Input Data Pasien</h2>
+          <span class="service-badge" id="form-badge" style="background:var(--rose-pale);color:var(--rose-dark)">ANC</span>
+        </div>
+        <div class="form-card">
+          <div id="dynamic-form"></div>
+          <div class="form-actions">
+            <button class="btn btn-secondary" onclick="resetForm()">Reset</button>
+            <button class="btn btn-primary" onclick="submitForm()">
+              <span>Simpan Data</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA PASIEN PAGE -->
+      <div class="page" id="page-data-pasien">
+        <h2 class="section-title" style="margin-bottom:18px">Data Pasien</h2>
+        <div class="search-bar">
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="search-input" placeholder="Cari nama pasien atau No. Rekam Medik...">
+          </div>
+          <select id="search-service" style="padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:0.88rem;background:white;cursor:pointer;">
+            <option value="">Semua Layanan</option>
+            <option value="ANC">ANC</option>
+            <option value="INC">INC</option>
+            <option value="PNC">PNC</option>
+            <option value="KB">KB</option>
+            <option value="IMUNISASI">Imunisasi</option>
+            <option value="BAYI_BALITA">Bayi Balita Anak</option>
+            <option value="UMUM">Umum</option>
+            <option value="RAWAT_INAP">Rawat Inap</option>
+          </select>
+          <button class="btn-search" onclick="searchPasien()">Cari</button>
+        </div>
+        <div class="data-table-wrap">
+          <table>
+            <thead><tr>
+              <th>No. RM</th><th>Nama Pasien</th><th>Layanan</th>
+              <th>Tanggal</th><th>Keluhan</th><th>Petugas</th>
+            </tr></thead>
+            <tbody id="data-table-body">
+              <tr><td colspan="6" style="text-align:center;padding:36px;color:var(--text-muted)">Belum ada data pasien tersimpan.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- OPERASIONAL PAGE -->
+      <div class="page" id="page-operasional">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h2 class="section-title" style="margin:0">Operasional Stok</h2>
+          <button class="btn btn-teal" onclick="openTambahStok()">+ Tambah Item</button>
+        </div>
+        <div class="ops-tabs">
+          <button class="ops-tab active" onclick="switchOpsTab('obat',this)">Obat</button>
+          <button class="ops-tab" onclick="switchOpsTab('vaksin',this)">Vaksin</button>
+          <button class="ops-tab" onclick="switchOpsTab('bhp',this)">Barang Habis Pakai</button>
+        </div>
+        <div class="ops-grid">
+          <div class="ops-card">
+            <h3>Daftar Stok</h3>
+            <div class="stok-list" id="stok-list"></div>
+          </div>
+          <div class="ops-card">
+            <h3>Mutasi Stok</h3>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Nama Item</label>
+              <select id="mutasi-item" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.85rem;background:var(--bg)"></select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Jenis</label>
+              <select id="mutasi-jenis" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.85rem;background:var(--bg)">
+                <option value="masuk">Stok Masuk</option>
+                <option value="keluar">Stok Keluar</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Jumlah</label>
+              <input type="number" id="mutasi-qty" min="1" value="1" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.85rem;background:var(--bg)">
+            </div>
+            <div class="form-group" style="margin-bottom:16px">
+              <label>Keterangan</label>
+              <input type="text" id="mutasi-ket" placeholder="Opsional..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.85rem;background:var(--bg)">
+            </div>
+            <button class="btn btn-teal" style="width:100%" onclick="saveMutasi()">Simpan Mutasi</button>
+
+            <h3 style="margin-top:22px;margin-bottom:12px">Riwayat Mutasi</h3>
+            <div id="mutasi-history" style="display:grid;gap:8px;max-height:300px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL TAMBAH STOK -->
+<div class="modal-overlay" id="modal-stok">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Tambah Item Stok</h3>
+      <button class="modal-close" onclick="closeModal('modal-stok')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Nama Item <span class="req">*</span></label>
+        <input type="text" id="new-item-name" placeholder="Nama obat/vaksin/barang">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Kategori <span class="req">*</span></label>
+        <select id="new-item-cat" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.85rem;background:var(--bg)">
+          <option value="obat">Obat</option>
+          <option value="vaksin">Vaksin</option>
+          <option value="bhp">Barang Habis Pakai</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Stok Awal <span class="req">*</span></label>
+        <input type="number" id="new-item-qty" min="0" value="0">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Batas Minimal Stok (notifikasi)</label>
+        <input type="number" id="new-item-min" min="1" value="5">
+      </div>
+      <div class="form-group" style="margin-bottom:20px">
+        <label>Satuan</label>
+        <input type="text" id="new-item-unit" placeholder="tablet, botol, pcs, dll">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="saveNewItem()">Tambah Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIF PANEL -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-header">Notifikasi Stok</div>
+  <div id="notif-list"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+const GAS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Ganti dengan URL deployment Anda
+let currentUser = null;
+let currentService = null;
+let currentOpsTab = 'obat';
+let allPasienData = [];
+let stokData = JSON.parse(localStorage.getItem('pmb_stok') || '[]');
+let mutasiData = JSON.parse(localStorage.getItem('pmb_mutasi') || '[]');
+
+// ===== UTILS =====
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('id-ID', {day:'2-digit',month:'long',year:'numeric'});
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+function noRM() {
+  const now = new Date();
+  const y = now.getFullYear().toString().slice(2);
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const r = Math.floor(Math.random()*9000)+1000;
+  return `${y}${m}${r}`;
+}
+
+// ===== LOGIN =====
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value.trim();
+  if (!u || !p) { showLoginErr('Isi username dan password.'); return; }
+  callGAS('login', {username:u, password:p}, (res) => {
+    if (res.success) {
+      currentUser = res.user;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').classList.add('active');
+      document.getElementById('sidebar-username').textContent = currentUser.nama || u;
+      document.getElementById('sidebar-role').textContent = currentUser.role || 'Bidan';
+      document.getElementById('user-avatar-text').textContent = (currentUser.nama || u).charAt(0).toUpperCase();
+      updateTopbarDate();
+      loadDashboard();
+    } else { showLoginErr(res.message || 'Login gagal.'); }
+  }, true);
+}
+
+function showLoginErr(msg) {
+  const el = document.getElementById('login-err');
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('login-user').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// ===== API CALL =====
+function callGAS(action, data, callback, silent=false) {
+  if (!silent) showToast('Menghubungi server...','');
+  fetch(GAS_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({action, ...data})
+  })
+  .then(r => r.json())
+  .then(res => { callback(res); })
+  .catch(err => {
+    console.error(err);
+    // Fallback: simulasi offline untuk demo
+    handleOffline(action, data, callback);
+  });
+}
+
+// Demo offline fallback
+const demoUsers = [{username:'admin',password:'admin123',nama:'Admin PMB',role:'Bidan'},{username:'pipit',password:'pipit123',nama:'Bidan Pipit',role:'Bidan'}];
+function handleOffline(action, data, cb) {
+  if (action==='login') {
+    const u = demoUsers.find(x=>x.username===data.username&&x.password===data.password);
+    cb(u ? {success:true,user:u} : {success:false,message:'Username/password salah'});
+  } else if (action==='savePasien') {
+    const stored = JSON.parse(localStorage.getItem('pmb_pasien')||'[]');
+    stored.push({...data.payload, noRM: noRM(), savedAt: new Date().toISOString(), savedBy: currentUser?.nama});
+    localStorage.setItem('pmb_pasien', JSON.stringify(stored));
+    cb({success:true});
+  } else if (action==='getPasien') {
+    const stored = JSON.parse(localStorage.getItem('pmb_pasien')||'[]');
+    cb({success:true, data:stored});
+  } else if (action==='saveStok') {
+    cb({success:true});
+  } else { cb({success:true, data:[]}); }
+}
+
+// ===== NAVIGATION =====
+function showPage(page, navEl) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg = document.getElementById(`page-${page}`);
+  if (pg) pg.classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  const titles = {dashboard:'Dashboard',layanan:'Input Pasien','data-pasien':'Data Pasien',operasional:'Operasional',form:'Input Data Pasien'};
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+  if (page==='dashboard') loadDashboard();
+  if (page==='data-pasien') loadDataPasien();
+  if (page==='operasional') renderStok();
+}
+
+function toggleSub(id, el) {
+  const sub = document.getElementById(id);
+  sub.classList.toggle('open');
+  const ch = el.querySelector('.chevron');
+  if (ch) ch.style.transform = sub.classList.contains('open') ? 'rotate(180deg)' : '';
+  el.classList.toggle('active', sub.classList.contains('open'));
+  if (sub.classList.contains('open') && id==='sub-layanan') showPage('layanan');
+}
+
+function showOps(tab, el) {
+  showPage('operasional');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const opsNav = [...document.querySelectorAll('.nav-item')].find(n=>n.textContent.includes('Operasional'));
+  if (opsNav) opsNav.classList.add('active');
+  switchOpsTab(tab);
+}
+
+function switchOpsTab(tab, el) {
+  currentOpsTab = tab;
+  document.querySelectorAll('.ops-tab').forEach(t=>t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    const tabs = document.querySelectorAll('.ops-tab');
+    const idx = ['obat','vaksin','bhp'].indexOf(tab);
+    if (tabs[idx]) tabs[idx].classList.add('active');
+  }
+  renderStok();
+  renderMutasiHistory();
+  populateMutasiSelect();
+}
+
+function updateTopbarDate() {
+  const d = new Date();
+  document.getElementById('topbar-date').textContent = d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+// ===== DASHBOARD =====
+function loadDashboard() {
+  callGAS('getPasien', {}, (res) => {
+    if (!res.success) return;
+    allPasienData = res.data || [];
+    const today = new Date().toDateString();
+    const now = new Date();
+    const thisMonth = now.getMonth(); const thisYear = now.getFullYear();
+    const pasienHari = allPasienData.filter(p => new Date(p.tanggalKedatangan||p.savedAt).toDateString()===today);
+    const pasienBulan = allPasienData.filter(p => {
+      const d = new Date(p.tanggalKedatangan||p.savedAt);
+      return d.getMonth()===thisMonth && d.getFullYear()===thisYear;
+    });
+    const bumil = allPasienData.filter(p => {
+      const d = new Date(p.tanggalKedatangan||p.savedAt);
+      return p.layanan==='ANC' && d.getMonth()===thisMonth && d.getFullYear()===thisYear;
+    });
+    document.getElementById('dash-hari').textContent = pasienHari.length;
+    document.getElementById('dash-bulan').textContent = pasienBulan.length;
+    document.getElementById('dash-bumil').textContent = bumil.length;
+    document.getElementById('dash-total').textContent = allPasienData.length;
+    document.getElementById('dash-hari-sub').textContent = formatDate(new Date());
+    ['ANC','INC','PNC','KB','IMUNISASI','BAYI_BALITA','UMUM','RAWAT_INAP'].forEach(s => {
+      const el = document.getElementById(`ss-${s}`);
+      if (el) el.textContent = pasienBulan.filter(p=>p.layanan===s).length;
+    });
+    const bumilList = document.getElementById('bumil-list');
+    if (bumil.length===0) {
+      bumilList.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/></svg><p>Belum ada data bumil aktif</p></div>`;
+    } else {
+      bumilList.innerHTML = bumil.slice(0,5).map(p=>`
+        <div class="bumil-item">
+          <div class="bumil-avatar">${(p.namaPasien||'?').charAt(0)}</div>
+          <div class="bumil-info">
+            <div class="bname">${p.namaPasien||'-'}</div>
+            <div class="bdetail">UK: ${p.usiaKehamilan||'-'} | TP: ${p.taksiranPersalinan||'-'}</div>
+          </div>
+          <span class="bumil-usia">${p.usiaKehamilan||'-'}</span>
+        </div>`).join('');
+    }
+  }, true);
+  checkStokNotif();
+}
+
+// ===== FORM =====
+const formDefs = {
+  ANC: [
+    {section:'Data Kunjungan'},
+    {id:'tanggalKedatangan',label:'Tanggal Kedatangan',type:'date',req:true},
+    {section:'Data Pasien'},
+    {id:'namaPasien',label:'Nama Pasien',type:'text',req:true},
+    {id:'namaSuami',label:'Nama Suami',type:'text'},
+    {id:'tempatLahir',label:'Tempat Lahir',type:'text'},
+    {id:'tanggalLahir',label:'Tanggal Lahir',type:'date'},
+    {id:'usia',label:'Usia',type:'number',placeholder:'tahun'},
+    {id:'alamatLengkap',label:'Alamat Lengkap',type:'textarea',full:true},
+    {id:'desa',label:'Desa/Kelurahan',type:'text'},
+    {id:'kecamatan',label:'Kecamatan',type:'text'},
+    {id:'noHp',label:'No HP',type:'tel'},
+    {section:'Data Kehamilan'},
+    {id:'kehamilanKe',label:'Kehamilan Ke-',type:'number'},
+    {id:'keluhanPasien',label:'Keluhan Pasien',type:'textarea',full:true},
+    {id:'hpht',label:'HPHT',type:'date'},
+    {id:'taksiranPersalinan',label:'Taksiran Persalinan',type:'date'},
+    {section:'Pemeriksaan Fisik'},
+    {id:'tinggiBadan',label:'Tinggi Badan (cm)',type:'number'},
+    {id:'beratBadan',label:'Berat Badan (kg)',type:'number'},
+    {id:'lingkarLengan',label:'Lingkar Lengan Atas (cm)',type:'number'},
+    {id:'tekananDarah',label:'Tekanan Darah',type:'text',placeholder:'120/80 mmHg'},
+    {id:'usiaKehamilan',label:'Usia Kehamilan',type:'text',placeholder:'minggu'},
+    {id:'tfu',label:'TFU',type:'text',placeholder:'cm'},
+    {id:'letakJanin',label:'Letak Janin',type:'text'},
+    {id:'djj',label:'DJJ',type:'text',placeholder:'x/menit'},
+    {section:'Pemeriksaan Lab'},
+    {id:'labHb',label:'Haemoglobin',type:'text',placeholder:'g/dL'},
+    {id:'labGula',label:'Gula Darah',type:'text'},
+    {id:'labAsamUrat',label:'Asam Urat',type:'text'},
+    {id:'labCholesterol',label:'Cholesterol',type:'text'},
+    {id:'labTriple',label:'Triple Eliminasi (HIV/Sifilis/HBsAg)',type:'text'},
+    {id:'labProteinUrin',label:'Protein Urin',type:'text'},
+    {id:'golDarah',label:'Golongan Darah',type:'select',opts:['','A','B','AB','O']},
+    {section:'Penatalaksanaan'},
+    {id:'statusTT',label:'Status Imunisasi TT',type:'select',opts:['','T1','T2','T3','T4','T5']},
+    {id:'therapy',label:'Therapy yang Diberikan',type:'textarea',full:true},
+    {id:'nasihat',label:'Nasihat/Penatalaksanaan/Kontrol Ulang',type:'textarea',full:true},
+    {id:'tarif',label:'Tarif (Rp)',type:'number'},
+    {id:'keterangan',label:'Keterangan',type:'textarea',full:true},
+  ],
+  INC: [
+    {section:'Data Kunjungan'},
+    {id:'tanggalKunjungan',label:'Tanggal Kunjungan',type:'date',req:true},
+    {id:'noReg',label:'No Registrasi',type:'text'},
+    {section:'Data Pasien'},
+    {id:'namaPasien',label:'Nama Pasien',type:'text',req:true},
+    {id:'namaSuami',label:'Nama Suami',type:'text'},
+    {id:'tempatLahir',label:'Tempat Lahir',type:'text'},
+    {id:'tanggalLahir',label:'Tanggal Lahir',type:'date'},
+    {id:'usia',label:'Usia',type:'number'},
+    {id:'alamatLengkap',label:'Alamat Lengkap',type:'textarea',full:true},
+    {id:'desa',label:'Desa/Kelurahan',type:'text'},
+    {id:'kecamatan',label:'Kecamatan',type:'text'},
+    {section:'Data Persalinan'},
+    {id:'keluhanPasien',label:'Keluhan',type:'textarea',full:true},
+    {id:'kehamilanKe',label:'Kehamilan Ke-',type:'number'},
+    {id:'usiaKehamilan',label:'Usia Kehamilan',type:'text'},
+    {section:'Pemeriksaan'},
+    {id:'hasilPemeriksaan',label:'Hasil Pemeriksaan',type:'textarea',full:true},
+    {id:'tekananDarah',label:'Tekanan Darah',type:'text',placeholder:'mmHg'},
+    {id:'nadi',label:'Nadi',type:'text',placeholder:'x/menit'},
+    {id:'tfu',label:'TFU',type:'text'},
+    {id:'letakJanin',label:'Letak Janin',type:'text'},
+    {id:'djj',label:'Denyut Jantung Janin',type:'text'},
+    {id:'hisKontraksi',label:'His/Kontraksi',type:'text'},
+    {section:'Pemeriksaan Dalam'},
+    {id:'pemeriksaanDalam',label:'Pemeriksaan Dalam',type:'textarea',full:true},
+    {id:'vulvaVagina',label:'Vulva/Vagina',type:'text'},
+    {id:'pembukaan',label:'Pembukaan',type:'text'},
+    {id:'portio',label:'Portio',type:'text'},
+    {id:'ketuban',label:'Ketuban',type:'text'},
+    {id:'bagianTerendah',label:'Bagian Terendah Janin',type:'text'},
+    {id:'hodge',label:'Hodge',type:'select',opts:['','H I','H II','H III','H IV']},
+    {section:'Penatalaksanaan'},
+    {id:'penatalaksanaan',label:'Penatalaksanaan',type:'textarea',full:true},
+    {id:'tarif',label:'Tarif (Rp)',type:'number'},
+    {id:'keterangan',label:'Keterangan',type:'textarea'},
+  ],
+  PNC: [
+    {section:'Data Kunjungan'},
+    {id:'tanggalKedatangan',label:'Tanggal Kedatangan',type:'date',req:true},
+    {section:'Data Pasien'},
+    {id:'namaIbu',label:'Nama Ibu / Nama Suami',type:'text',req:true},
+    {id:'tempatTglLahir',label:'Tempat Tanggal Lahir',type:'text'},
+    {id:'usia',label:'Usia',type:'number'},
+    {id:'alamatLengkap',label:'Alamat Lengkap',type:'textarea',full:true},
+    {id:'noHp',label:'No HP',type:'tel'},
+    {section:'Data Nifas'},
+    {id:'persalinanKe',label:'Persalinan Ke-',type:'number'},
+    {id:'keluhanPasien',label:'Keluhan Pasien',type:'textarea',full:true},
+    {id:'tanggalPersalinan',label:'Tanggal Persalinan',type:'date'},
+    {id:'tempatBersalin',label:'Tempat Bersalin',type:'text'},
+    {section:'Pemeriksaan'},
+    {id:'tinggiBadan',label:'Tinggi Badan (cm)',type:'number'},
+    {id:'beratBadan',label:'Berat Badan (kg)',type:'number'},
+    {id:'tekananDarah',label:'Tekanan Darah',type:'text',placeholder:'mmHg'},
+    {id:'kunjunganNifasKe',label:'Kunjungan Nifas Ke-',type:'number'},
+    {id:'tfu',label:'TFU (Tinggi Fundus Uteri)',type:'text'},
+    {id:'kontraksiUterus',label:'Kontraksi Uterus',type:'text'},
+    {id:'lochea',label:'Lochea',type:'text'},
+    {id:'laserasi',label:'Laserasi',type:'text'},
+    {section:'Penatalaksanaan'},
+    {id:'therapy',label:'Therapy yang Diberikan',type:'textarea',full:true},
+    {id:'nasihat',label:'Nasihat/Penatalaksanaan/Kontrol Ulang',type:'textarea',full:true},
+    {id:'tarif',label:'Tarif (Rp)',type:'number'},
+  ],
+  KB: [
+    {section:'Data Kunjungan'},
+    {id:'tanggalKedatangan',label:'Tanggal Kedatangan',type:'date',req:true},
+    {section:'Data Pasien'},
+    {id:'namaIstri',label:'Nama Istri',type:'text',req:true},
+    {id:'namaSuami',label:'Nama Suami',type:'text'},
+    {id:'noHp',label:'No HP',type:'tel'},
+    {id:'tempatTglLahir',label:'Tempat Tanggal Lahir',type:'text'},
+    {id:'usia',label:'Usia',type:'number'},
+    {id:'alamatLengkap',label:'Alamat Lengkap',type:'textarea',full:true},
+    {section:'Data KB'},
+    {id:'jenisKontrasepsi',label:'Jenis Kontrasepsi',type:'select',opts:['','Pil','Suntik 1 Bulan','Suntik 3 Bulan','IUD/Spiral','Implant','Kondom','MOW','MOP']},
+    {section:'Pemeriksaan'},
+    {id:'tekananDarah',label:'Tekanan Darah',type:'text'},
+    {id:'beratBadan',label:'Berat Badan (kg)',type:'number'},
+    {id:'tanggalKembali',label:'Tanggal Kembali',type:'date'},
+    {id:'tarif',label:'Tarif (Rp)',type:'number'},
+  ],
+  IMUNISASI: [
+    {section:'Data Kunjungan'},
+    {id:'tanggalKedatangan',label:'Tanggal Kedatangan',type:'date',req:true},
+    {section:'Data Bayi'},
+    {id:'namaBayi',label:'Nama Lengkap Bayi',type:'text',req:true},
+    {id:'tempatTglLahir',label:'Tempat Tanggal Lahir',type:'text'},
+    {id:'usia',label:'Usia',type:'text',placeholder:'bulan'},
+    {id:'namaIbu',label:'Nama Ibu',type:'text'},
+    {id:'namaAyah',label:'Nama Ayah',type:'text'},
+    {id:'alamatLengkap',label:'Alamat Lengkap',type:'textarea',full:true},
+    {id:'noHp',label:'No HP',type:'tel'},
+    {section:'Pemeriksaan'},
+    {id:'beratBadan',label:'Berat Badan (kg)',type:'number'},
+    {id:'panjangBadan',label:'Panjang Badan (cm)',type:'number'},
+    {id:'suhu',label:'Suhu (°C)',type:'number',placeholder:'36.5'},
+    {id:'vaksin',label:'Vaksin yang Diberikan',type:'textarea',full:true},
+    {id:'tarif',label:'Tarif (Rp)',type:'number'},
+  ],
+  BAYI_BALITA: [
+    {section:'Data Kunjungan'},
+    {id:'tanggalKedatangan',label:'Tanggal Kedatangan',type:'date',req:true},
+    {section:'Data Anak'},
+    {id:'namaAnak',label:'Nama Anak',type:'text',req:true},
+    {id:'tempatTglLahir',label:'Tempat Tanggal Lahir',type:'text'},
+    {id:'usia',label:'Usia',type:'text'},
+    {id:'namaIbu',label:'Nama Ibu',type:'text'},
+    {id:'namaAyah',label:'Nama Ayah',type:'text'},
+    {id:'alamatLengkap',label:'Alamat Lengkap',type:'textarea',full:true},
+    {id:'noHp',label:'No HP',type:'tel'},
+    {section:'Pemeriksaan'},
+    {id:'keluhan',label:'Keluhan',type:'textarea',full:true},
+    {id:'beratBadan',label:'Berat Badan (kg)',type:'number'},
+    {id:'suhu',label:'Suhu (°C)',type:'number'},
+    {id:'terapi',label:'Terapi yang Diberikan',type:'textarea',full:true},
+    {id:'kunjunganUlang',label:'Kunjungan Ulang',type:'date'},
+    {id:'tarif',label:'Tarif (Rp)',type:'number'},
+  ],
+  UMUM: [
+    {section:'Data Kunjungan'},
+    {id:'tanggalKedatangan',label:'Tanggal Kedatangan',type:'date',req:true},
+    {section:'Data Pasien'},
+    {id:'namaPasien',label:'Nama',type:'text',req:true},
+    {id:'tempatTglLahir',label:'Tempat Tanggal Lahir',type:'text'},
+    {id:'usia',label:'Usia',type:'number'},
+    {id:'alamatLengkap',label:'Alamat Lengkap',type:'textarea',full:true},
+    {id:'noHp',label:'No HP',type:'tel'},
+    {section:'Pemeriksaan'},
+    {id:'keluhan',label:'Keluhan',type:'textarea',full:true},
+    {id:'tekananDarah',label:'Tekanan Darah',type:'text'},
+    {id:'beratBadan',label:'Berat Badan (kg)',type:'number'},
+    {id:'suhu',label:'Suhu (°C)',type:'number'},
+    {id:'terapi',label:'Terapi yang Diberikan',type:'textarea',full:true},
+    {id:'kunjunganUlang',label:'Kunjungan Ulang',type:'date'},
+    {id:'tarif',label:'Tarif (Rp)',type:'number'},
+  ],
+  RAWAT_INAP: [
+    {section:'Data Kunjungan'},
+    {id:'tanggalKedatangan',label:'Tanggal Kedatangan',type:'date',req:true},
+    {section:'Data Pasien'},
+    {id:'namaPasien',label:'Nama',type:'text',req:true},
+    {id:'tempatTglLahir',label:'Tempat Tanggal Lahir',type:'text'},
+    {id:'usia',label:'Usia',type:'number'},
+    {id:'alamatLengkap',label:'Alamat Lengkap',type:'textarea',full:true},
+    {id:'noHp',label:'No HP',type:'tel'},
+    {section:'Pemeriksaan'},
+    {id:'keluhan',label:'Keluhan',type:'textarea',full:true},
+    {id:'tekananDarah',label:'Tekanan Darah',type:'text'},
+    {id:'beratBadan',label:'Berat Badan (kg)',type:'number'},
+    {id:'suhu',label:'Suhu (°C)',type:'number'},
+    {id:'terapi',label:'Terapi yang Diberikan',type:'textarea',full:true},
+    {id:'kunjunganUlang',label:'Kunjungan Ulang',type:'date'},
+    {id:'tarif',label:'Tarif (Rp)',type:'number'},
+  ]
+};
+
+const serviceBadgeColors = {
+  ANC:'background:#FDE8F4;color:#C0186C',
+  INC:'background:var(--rose-pale);color:var(--rose-dark)',
+  PNC:'background:#FEF1EA;color:#C06030',
+  KB:'background:var(--teal-pale);color:var(--teal)',
+  IMUNISASI:'background:#EBF2FD;color:#2050A0',
+  BAYI_BALITA:'background:#F5EAFD;color:#6B20A0',
+  UMUM:'background:var(--gold-pale);color:#906B00',
+  RAWAT_INAP:'background:#EEF1F7;color:var(--navy)'
+};
+const serviceLabels = {ANC:'ANC',INC:'INC',PNC:'PNC',KB:'KB',IMUNISASI:'Imunisasi',BAYI_BALITA:'Bayi Balita Anak',UMUM:'Umum',RAWAT_INAP:'Rawat Inap'};
+
+function showForm(service, navEl) {
+  currentService = service;
+  const fields = formDefs[service];
+  if (!fields) return;
+  document.getElementById('form-title').textContent = `Input Data — ${serviceLabels[service]}`;
+  const badge = document.getElementById('form-badge');
+  badge.textContent = serviceLabels[service];
+  badge.style.cssText = serviceBadgeColors[service];
+  let html = '<div class="form-grid">';
+  fields.forEach(f => {
+    if (f.section) {
+      html += `</div><div class="form-section-title">${f.section}</div><div class="form-grid">`;
+      return;
+    }
+    const fullClass = f.full ? ' full' : '';
+    html += `<div class="form-group${fullClass}">`;
+    html += `<label>${f.label}${f.req?'<span class="req">*</span>':''}</label>`;
+    if (f.type==='textarea') {
+      html += `<textarea id="f_${f.id}" placeholder="${f.placeholder||''}"></textarea>`;
+    } else if (f.type==='select') {
+      html += `<select id="f_${f.id}">${(f.opts||[]).map(o=>`<option value="${o}">${o||'— Pilih —'}</option>`).join('')}</select>`;
+    } else {
+      html += `<input type="${f.type}" id="f_${f.id}" placeholder="${f.placeholder||''}">`;
+    }
+    html += `</div>`;
+  });
+  html += '</div>';
+  document.getElementById('dynamic-form').innerHTML = html;
+  // Set today's date for date fields
+  fields.filter(f=>f.type==='date').forEach(f=>{
+    const el = document.getElementById(`f_${f.id}`);
+    if (el && !el.value) el.value = today();
+  });
+  showPage('form');
+  document.getElementById('topbar-title').textContent = `Input — ${serviceLabels[service]}`;
+  if (navEl) {
+    document.querySelectorAll('.nav-sub-item').forEach(n=>n.classList.remove('active'));
+    navEl.classList.add('active');
+  }
+}
+
+function resetForm() {
+  if (!currentService) return;
+  const fields = formDefs[currentService] || [];
+  fields.filter(f=>f.id).forEach(f=>{
+    const el = document.getElementById(`f_${f.id}`);
+    if (el) { el.value = f.type==='date' ? today() : ''; }
+  });
+}
+
+function submitForm() {
+  if (!currentService) return;
+  const fields = formDefs[currentService] || [];
+  const required = fields.filter(f=>f.req);
+  for (const f of required) {
+    const el = document.getElementById(`f_${f.id}`);
+    if (el && !el.value.trim()) {
+      showToast(`"${f.label}" wajib diisi`, 'error');
+      el.focus(); el.style.borderColor='var(--rose)';
+      setTimeout(()=>el.style.borderColor='', 2000);
+      return;
+    }
+  }
+  const payload = { layanan: currentService, savedBy: currentUser?.nama || 'Admin' };
+  fields.filter(f=>f.id).forEach(f=>{
+    const el = document.getElementById(`f_${f.id}`);
+    if (el) payload[f.id] = el.value;
+  });
+  // Set nama pasien field
+  payload.namaPasien = payload.namaPasien || payload.namaIbu || payload.namaIstri || payload.namaBayi || payload.namaAnak || '-';
+  payload.tanggalKedatangan = payload.tanggalKedatangan || payload.tanggalKunjungan || today();
+  callGAS('savePasien', {payload}, (res) => {
+    if (res.success) {
+      showToast('Data berhasil disimpan!', 'success');
+      resetForm();
+      loadDashboard();
+    } else { showToast(res.message||'Gagal menyimpan data', 'error'); }
+  });
+}
+
+// ===== DATA PASIEN =====
+function loadDataPasien() {
+  callGAS('getPasien', {}, (res) => {
+    if (!res.success) return;
+    allPasienData = res.data || [];
+    renderDataTable(allPasienData);
+  }, true);
+}
+
+function renderDataTable(data) {
+  const tbody = document.getElementById('data-table-body');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--text-muted)">Tidak ada data ditemukan.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.slice().reverse().slice(0,100).map(p => {
+    const tagClass = `tag-${(p.layanan||'umum').toLowerCase().replace('_','')}`;
+    return `<tr>
+      <td style="font-family:monospace;font-size:0.78rem">${p.noRM||'-'}</td>
+      <td><strong>${p.namaPasien||'-'}</strong></td>
+      <td><span class="tag ${tagClass}">${serviceLabels[p.layanan]||p.layanan||'-'}</span></td>
+      <td>${formatDate(p.tanggalKedatangan)||'-'}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.keluhanPasien||p.keluhan||'-'}</td>
+      <td style="color:var(--text-muted);font-size:0.78rem">${p.savedBy||'-'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function searchPasien() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const svc = document.getElementById('search-service').value;
+  let filtered = allPasienData;
+  if (q) filtered = filtered.filter(p => (p.namaPasien||'').toLowerCase().includes(q) || (p.noRM||'').toLowerCase().includes(q));
+  if (svc) filtered = filtered.filter(p => p.layanan===svc);
+  renderDataTable(filtered);
+}
+
+document.getElementById('search-input').addEventListener('keydown', e => { if(e.key==='Enter') searchPasien(); });
+
+// ===== OPERASIONAL =====
+function renderStok() {
+  const list = stokData.filter(s => s.kategori === currentOpsTab);
+  const container = document.getElementById('stok-list');
+  if (!list.length) {
+    container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg><p>Belum ada item</p></div>`;
+    return;
+  }
+  container.innerHTML = list.map(s => {
+    const low = s.stok <= (s.minStok||5);
+    return `<div class="stok-item${low?' low':''}">
+      <div class="stok-info">
+        <div class="sitem-name">${s.nama}</div>
+        <div class="sitem-detail">${s.satuan||'unit'} · Min: ${s.minStok||5}${low?`<span class="stok-warn">⚠ Stok Menipis!</span>`:''}</div>
+      </div>
+      <div class="stok-qty">${s.stok}</div>
+    </div>`;
+  }).join('');
+  populateMutasiSelect();
+  checkStokNotif();
+}
+
+function populateMutasiSelect() {
+  const sel = document.getElementById('mutasi-item');
+  const list = stokData.filter(s => s.kategori === currentOpsTab);
+  sel.innerHTML = list.map(s=>`<option value="${s.id}">${s.nama}</option>`).join('') || '<option value="">Tidak ada item</option>';
+}
+
+function renderMutasiHistory() {
+  const container = document.getElementById('mutasi-history');
+  const history = mutasiData.filter(m => m.kategori === currentOpsTab).slice().reverse().slice(0,20);
+  if (!history.length) { container.innerHTML = '<p style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:16px">Belum ada mutasi</p>'; return; }
+  container.innerHTML = history.map(m=>`
+    <div style="display:flex;gap:10px;align-items:center;padding:8px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+      <div style="width:28px;height:28px;border-radius:8px;background:${m.jenis==='masuk'?'var(--teal-pale)':'var(--rose-pale)'};display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:${m.jenis==='masuk'?'var(--teal)':'var(--rose)'};flex-shrink:0">${m.jenis==='masuk'?'+':'-'}</div>
+      <div style="flex:1">
+        <div style="font-size:0.8rem;font-weight:600;color:var(--navy)">${m.itemNama}</div>
+        <div style="font-size:0.72rem;color:var(--text-muted)">${m.qty} ${m.satuan||''} · ${m.ket||''} · ${formatDate(m.tanggal)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function saveMutasi() {
+  const itemId = document.getElementById('mutasi-item').value;
+  const jenis = document.getElementById('mutasi-jenis').value;
+  const qty = parseInt(document.getElementById('mutasi-qty').value)||0;
+  const ket = document.getElementById('mutasi-ket').value;
+  if (!itemId || !qty) { showToast('Pilih item dan isi jumlah', 'error'); return; }
+  const item = stokData.find(s=>s.id===itemId);
+  if (!item) { showToast('Item tidak ditemukan', 'error'); return; }
+  if (jenis==='keluar' && item.stok < qty) { showToast('Stok tidak mencukupi!', 'error'); return; }
+  item.stok += jenis==='masuk' ? qty : -qty;
+  const mutasi = {id:Date.now().toString(),itemId,itemNama:item.nama,jenis,qty,ket,satuan:item.satuan,kategori:currentOpsTab,tanggal:today(),savedBy:currentUser?.nama};
+  mutasiData.push(mutasi);
+  localStorage.setItem('pmb_stok', JSON.stringify(stokData));
+  localStorage.setItem('pmb_mutasi', JSON.stringify(mutasiData));
+  callGAS('saveMutasi', {mutasi, stok:stokData}, ()=>{});
+  document.getElementById('mutasi-qty').value=1;
+  document.getElementById('mutasi-ket').value='';
+  renderStok();
+  renderMutasiHistory();
+  showToast(`Stok ${jenis==='masuk'?'masuk':'keluar'} berhasil disimpan`, 'success');
+}
+
+function openTambahStok() { openModal('modal-stok'); }
+
+function saveNewItem() {
+  const nama = document.getElementById('new-item-name').value.trim();
+  const kat = document.getElementById('new-item-cat').value;
+  const qty = parseInt(document.getElementById('new-item-qty').value)||0;
+  const minStok = parseInt(document.getElementById('new-item-min').value)||5;
+  const satuan = document.getElementById('new-item-unit').value.trim()||'unit';
+  if (!nama) { showToast('Nama item wajib diisi', 'error'); return; }
+  const newItem = {id:Date.now().toString(),nama,kategori:kat,stok:qty,minStok,satuan};
+  stokData.push(newItem);
+  localStorage.setItem('pmb_stok', JSON.stringify(stokData));
+  callGAS('saveStok', {stok:stokData}, ()=>{});
+  closeModal('modal-stok');
+  if (kat===currentOpsTab) { renderStok(); }
+  showToast('Item berhasil ditambahkan', 'success');
+}
+
+function checkStokNotif() {
+  const low = stokData.filter(s => s.stok <= (s.minStok||5));
+  const badge = document.getElementById('notif-badge');
+  const notifList = document.getElementById('notif-list');
+  if (low.length > 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = `${low.length} Stok Menipis`;
+    notifList.innerHTML = low.map(s=>`
+      <div class="notif-item">
+        <div class="notif-dot"></div>
+        <div>
+          <div class="notif-text"><strong>${s.nama}</strong> — stok tersisa ${s.stok} ${s.satuan||'unit'}</div>
+          <div class="notif-time">Kategori: ${s.kategori}</div>
+        </div>
+      </div>`).join('');
+  } else {
+    badge.style.display = 'none';
+    notifList.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:0.82rem">Tidak ada notifikasi</div>`;
+  }
+}
+
+function toggleNotif() {
+  document.getElementById('notif-panel').classList.toggle('open');
+}
+
+// ===== MODAL =====
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+document.addEventListener('click', e => {
+  if (!e.target.closest('#notif-panel') && !e.target.closest('#notif-badge')) document.getElementById('notif-panel').classList.remove('open');
+});
+
+// ===== INIT =====
+updateTopbarDate();
+setInterval(updateTopbarDate, 60000);
+</script>
+</body>
+</html>
