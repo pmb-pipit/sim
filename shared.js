@@ -56,20 +56,35 @@ function updateTopbarDate() {
   el.textContent = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-// ===== API CALL =====
+// ===== API CALL (JSONP - bypass CORS) =====
 function callGAS(action, data, callback, silent = false) {
   if (!silent) showToast('Menyimpan data...', '');
+
+  const callbackName = 'cb_' + Date.now();
+  
+  // Daftarkan callback global sementara
+  window[callbackName] = function(res) {
+    callback(res);
+    delete window[callbackName];
+    document.getElementById('gas-script')?.remove();
+  };
+
   const params = new URLSearchParams({
     action: action,
-    data: JSON.stringify(data)
+    data: JSON.stringify(data),
+    callback: callbackName
   });
-  fetch(`${GAS_URL}?${params.toString()}`)
-    .then(r => r.json())
-    .then(res => callback(res))
-    .catch(err => {
-      console.error('GAS Error:', err);
-      handleOffline(action, data, callback);
-    });
+
+  const script = document.createElement('script');
+  script.id = 'gas-script';
+  script.src = `${GAS_URL}?${params.toString()}`;
+  script.onerror = function() {
+    console.error('GAS script error');
+    delete window[callbackName];
+    script.remove();
+    handleOffline(action, data, callback);
+  };
+  document.body.appendChild(script);
 }
 
 const demoUsers = [
