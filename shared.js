@@ -150,11 +150,14 @@ function doLogout() {
 // ===== PAGE LOADER =====
 function loadPage(file, navEl) {
   if (!currentUser) return;
-  fetch(file)
+  
+  // Tambah base path sesuai nama repo
+  const basePath = '/sim/';
+  
+  fetch(basePath + file)
     .then(r => r.text())
     .then(html => {
       document.getElementById('content-area').innerHTML = html;
-      // Jalankan script di dalam halaman yang dimuat
       const scripts = document.getElementById('content-area').querySelectorAll('script');
       scripts.forEach(s => {
         const newScript = document.createElement('script');
@@ -163,8 +166,22 @@ function loadPage(file, navEl) {
       });
     })
     .catch(() => {
-      document.getElementById('content-area').innerHTML = `<div class="empty-state"><p>Gagal memuat halaman: ${file}</p></div>`;
+      document.getElementById('content-area').innerHTML = 
+        `<div class="empty-state"><p>Gagal memuat halaman: ${file}</p></div>`;
     });
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+
+  const titles = {
+    'dashboard.html': 'Dashboard',
+    'input-pasien.html': 'Input Pasien',
+    'data-pasien.html': 'Data Pasien',
+    'operasional.html': 'Operasional'
+  };
+  const el = document.getElementById('topbar-title');
+  if (el) el.textContent = titles[file] || file;
+}
 
   // Update nav aktif
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
