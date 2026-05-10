@@ -58,15 +58,18 @@ function updateTopbarDate() {
 
 // ===== API CALL =====
 function callGAS(action, data, callback, silent = false) {
-  if (!silent) showToast('Menghubungi server...', '');
-  fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, ...data })
-  })
+  if (!silent) showToast('Menyimpan data...', '');
+  const params = new URLSearchParams({
+    action: action,
+    data: JSON.stringify(data)
+  });
+  fetch(`${GAS_URL}?${params.toString()}`)
     .then(r => r.json())
     .then(res => callback(res))
-    .catch(() => handleOffline(action, data, callback));
+    .catch(err => {
+      console.error('GAS Error:', err);
+      handleOffline(action, data, callback);
+    });
 }
 
 const demoUsers = [
