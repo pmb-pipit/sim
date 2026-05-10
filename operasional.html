@@ -1,0 +1,55 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <h2 class="section-title" style="margin:0">Operasional Stok</h2>
+  <button class="btn btn-teal" onclick="openTambahStok()">+ Tambah Item</button>
+</div>
+
+<div class="ops-tabs">
+  <button class="ops-tab active" onclick="switchOpsTab('obat',this)">Obat</button>
+  <button class="ops-tab" onclick="switchOpsTab('vaksin',this)">Vaksin</button>
+  <button class="ops-tab" onclick="switchOpsTab('bhp',this)">Barang Habis Pakai</button>
+</div>
+
+<div class="ops-grid">
+  <!-- Daftar Stok -->
+  <div class="ops-card">
+    <h3>Daftar Stok</h3>
+    <div class="stok-list" id="stok-list">
+      <div class="empty-state"><p>Belum ada item</p></div>
+    </div>
+  </div>
+
+  <!-- Mutasi Stok -->
+  <div class="ops-card">
+    <h3>Mutasi Stok</h3>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>Nama Item</label>
+      <select id="mutasi-item" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.85rem;background:var(--bg)"></select>
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>Jenis</label>
+      <select id="mutasi-jenis" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.85rem;background:var(--bg)">
+        <option value="masuk">Stok Masuk</option>
+        <option value="keluar">Stok Keluar</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>Jumlah</label>
+      <input type="number" id="mutasi-qty" min="1" value="1" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.85rem;background:var(--bg)">
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Keterangan</label>
+      <input type="text" id="mutasi-ket" placeholder="Opsional..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.85rem;background:var(--bg)">
+    </div>
+    <button class="btn btn-teal" style="width:100%" onclick="saveMutasi()">Simpan Mutasi</button>
+
+    <h3 style="margin-top:22px;margin-bottom:12px">Riwayat Mutasi</h3>
+    <div id="mutasi-history" style="display:grid;gap:8px;max-height:300px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<script>
+  // Inisialisasi tab aktif dan render stok
+  currentOpsTab = 'obat';
+  renderStok();
+  renderMutasiHistory();
+</script>

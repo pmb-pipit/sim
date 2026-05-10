@@ -1,0 +1,49 @@
+<h2 class="section-title" style="margin-bottom:18px">Data Pasien</h2>
+
+<div class="search-bar">
+  <div class="search-input-wrap">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <input type="text" id="search-input" placeholder="Cari nama pasien atau No. Rekam Medik...">
+  </div>
+  <select id="search-service" style="padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:0.88rem;background:white;cursor:pointer;">
+    <option value="">Semua Layanan</option>
+    <option value="ANC">ANC</option>
+    <option value="INC">INC</option>
+    <option value="PNC">PNC</option>
+    <option value="KB">KB</option>
+    <option value="IMUNISASI">Imunisasi</option>
+    <option value="BAYI_BALITA">Bayi Balita Anak</option>
+    <option value="UMUM">Umum</option>
+    <option value="RAWAT_INAP">Rawat Inap</option>
+  </select>
+  <button class="btn-search" onclick="searchPasien()">Cari</button>
+</div>
+
+<div class="data-table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>No. RM</th>
+        <th>Nama Pasien</th>
+        <th>Layanan</th>
+        <th>Tanggal</th>
+        <th>Keluhan</th>
+        <th>Petugas</th>
+      </tr>
+    </thead>
+    <tbody id="data-table-body">
+      <tr>
+        <td colspan="6" style="text-align:center;padding:36px;color:var(--text-muted)">
+          Memuat data...
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Load data dan pasang event enter
+  loadDataPasien();
+  const searchEl = document.getElementById('search-input');
+  if (searchEl) searchEl.addEventListener('keydown', e => { if (e.key === 'Enter') searchPasien(); });
+</script>
